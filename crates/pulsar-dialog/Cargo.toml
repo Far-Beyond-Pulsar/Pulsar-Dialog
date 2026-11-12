@@ -1,0 +1,15 @@
+[package]
+name = "pulsar-dialog"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "The pulsar-dialog helper: shows one Pulsar dialog in its own process and prints the answer. For callers with no window or no working GPU yet"
+
+[[bin]]
+name = "pulsar-dialog"
+path = "src/main.rs"
+
+[dependencies]
+pulsar_dialog.workspace = true
+serde_json.workspace = true

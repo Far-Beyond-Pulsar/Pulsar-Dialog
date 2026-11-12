@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  # The protocol crate is what the engine links and has no GPU dependency, so
+  # it is tested everywhere. The UI crates need GPUI's platform libraries and
+  # are built on the platforms the engine ships.
+  protocol:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test the protocol crate
+        run: cargo test -p pulsar_dialog_protocol --all-features
+
+  ui:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the helper
+        run: cargo build -p pulsar-dialog
+      - name: Test
+        run: cargo test --workspace

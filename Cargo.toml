@@ -1,0 +1,39 @@
+[workspace]
+members = [
+    "crates/pulsar_dialog_protocol",
+    "crates/pulsar_dialog",
+    "crates/pulsar-dialog",
+]
+default-members = ["crates/pulsar-dialog"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+publish = false
+
+[workspace.dependencies]
+# The UI framework: WGPUI and its component library, at the revisions the
+# engine pins (Pulsar-Native `crates/ui/wgpui` and `crates/ui/wgpui-component`).
+gpui-ce = { git = "https://github.com/Far-Beyond-Pulsar/WGPUI", rev = "37bb0eeb4820e4e3c69d72a0cfed49924388bc68" }
+ui = { git = "https://github.com/Far-Beyond-Pulsar/WGPUI-Component", rev = "6a2087c74d69c411d031427756ad6cbbccb17e41" }
+
+pulsar_dialog_protocol = { path = "crates/pulsar_dialog_protocol" }
+pulsar_dialog = { path = "crates/pulsar_dialog" }
+
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+rfd = "0.17"
+
+# One GPUI for the whole graph. `ui` pins its own WGPUI revision; patching the
+# WGPUI source onto the one above keeps GPUI's types a single set. The `//` URL
+# spelling is what lets a patch point at a different rev of the same repository.
+[patch."https://github.com/Far-Beyond-Pulsar/WGPUI"]
+gpui-ce = { git = "https://github.com//Far-Beyond-Pulsar/WGPUI", rev = "37bb0eeb4820e4e3c69d72a0cfed49924388bc68" }
+
+[profile.release]
+opt-level = "s"
+lto = "thin"
+strip = true

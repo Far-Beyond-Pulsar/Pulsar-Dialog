@@ -1,0 +1,17 @@
+[package]
+name = "pulsar_dialog"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Pulsar's dialogs drawn with the engine's UI framework and themes: the view, theme selection, and a blocking runner for the pulsar-dialog helper"
+
+[dependencies]
+pulsar_dialog_protocol.workspace = true
+gpui-ce.workspace = true
+ui.workspace = true
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+directories = "6"

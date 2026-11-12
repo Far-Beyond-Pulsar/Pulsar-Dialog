@@ -1,0 +1,21 @@
+[package]
+name = "pulsar_dialog_protocol"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "What Pulsar asks of its dialogs and context menus, and the client that shows them through the pulsar-dialog helper. No UI or GPU dependency: the engine, the Hub and the installer link this"
+
+[features]
+default = []
+# When the helper cannot be started, show the platform's own message box
+# instead of giving up. For callers that must always be able to ask.
+native-fallback = ["dep:rfd"]
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+rfd = { workspace = true, optional = true }
+
+[lints.rust]
+unsafe_code = "forbid"
