@@ -19,11 +19,31 @@ pub const HELPER_ENV: &str = "PULSAR_DIALOG_EXE";
 
 const HELPER_NAME: &str = if cfg!(windows) { "pulsar-dialog.exe" } else { "pulsar-dialog" };
 
-/// Where the helper is: `PULSAR_DIALOG_EXE`, else beside the running
-/// executable, else on `PATH`.
+/// The helper's file name on this platform (`pulsar-dialog.exe`, `pulsar-dialog`).
+/// A host that ships the helper puts it under this name beside its own
+/// executable, which is where [`helper_path`] looks.
+pub const fn helper_file_name() -> &'static str {
+    HELPER_NAME
+}
+
+static HELPER_OVERRIDE: std::sync::OnceLock<PathBuf> = std::sync::OnceLock::new();
+
+/// Say where the helper is, for a host that put it somewhere other than
+/// beside its executable (a per-user cache, when that directory is read-only).
+/// Set once, early; later calls are ignored. Preferred over the environment
+/// variable, which cannot be set safely once other threads run.
+pub fn set_helper_path(path: PathBuf) {
+    let _ = HELPER_OVERRIDE.set(path);
+}
+
+/// Where the helper is: `PULSAR_DIALOG_EXE`, else the path a host gave with
+/// [`set_helper_path`], else beside the running executable, else on `PATH`.
 pub fn helper_path() -> Option<PathBuf> {
     if let Some(path) = std::env::var_os(HELPER_ENV).filter(|p| !p.is_empty()) {
         return Some(PathBuf::from(path));
+    }
+    if let Some(path) = HELPER_OVERRIDE.get().filter(|path| path.is_file()) {
+        return Some(path.clone());
     }
     let beside = std::env::current_exe()
         .ok()
