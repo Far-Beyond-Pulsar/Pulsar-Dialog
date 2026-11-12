@@ -21,6 +21,7 @@
 
 pub mod client;
 pub mod menu;
+pub mod progress;
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;

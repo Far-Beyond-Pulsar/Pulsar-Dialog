@@ -8,10 +8,12 @@
 //! * [`run::open_dialog`]: opens one in an app that already exists (the editor).
 
 pub mod layout;
+pub mod progress;
 pub mod run;
 pub mod theme;
 pub mod view;
 
 pub use pulsar_dialog_protocol as protocol;
+pub use progress::run_progress_blocking;
 pub use run::{open_dialog, run_blocking};
 pub use view::{DialogDone, DialogView};

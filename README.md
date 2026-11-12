@@ -65,6 +65,27 @@ pulsar-dialog --request-file request.json     # or the JSON on stdin
 
 It prints one JSON line (the response) and exits 0.
 
+## Progress windows
+
+A long job (rebuilding the engine) is shown by `pulsar-dialog --progress`: the
+host sends a `ProgressRequest` as the first stdin line, then one
+`ProgressUpdate` per line (`update`, `failed` with buttons, `done`), and reads
+one `ProgressResponse` (`finished`, `answered`, `closed`) when the window ends.
+`pulsar_dialog_protocol::progress` wraps that:
+
+```rust
+use pulsar_dialog_protocol::progress::{start, ProgressRequest};
+
+let mut window = start(&ProgressRequest::new("Bootstrap Engine", "Rebuilding engine"))?;
+window.update(Some("Building release engine"), Some(0.4));
+// on success:  window.finish();
+// on failure:  let answer = window.fail(Some("Rebuild failed"), "cargo exited with 101", None, buttons);
+```
+
+After a failure the window stays until a button is pressed (Enter presses the
+default, Escape the cancel). If the host goes away while the job is running,
+the window closes. `cargo run --example progress_demo -- fail` shows it.
+
 ## Theme
 
 `state.json` in the per-user app-data directory names the saved theme; the
@@ -74,7 +95,7 @@ only reads: it never writes `state.json` or the themes folder.
 
 ## Status
 
-Built: requests and responses, the client, the dialog view (severity icon,
+Built: requests and responses, the client, progress windows, the dialog view (severity icon,
 message, detail, checkbox, buttons, Enter and Escape, close-as-answer), theme
 selection, the helper.
 
