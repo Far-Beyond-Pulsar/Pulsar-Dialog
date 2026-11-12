@@ -197,11 +197,21 @@ mod tests {
     }
 
     #[test]
-    fn a_missing_helper_is_unavailable_not_a_hang_or_a_panic() {
-        // SAFETY of the test environment: this test only reads the variable it sets.
+    fn a_missing_helper_is_an_error_not_a_hang_or_a_panic() {
+        // `try_show`, not `show`: with `native-fallback`, `show` would put a real
+        // message box on the screen.
         std::env::set_var(HELPER_ENV, "definitely-not-a-real-helper-xyz");
-        let response = show(&DialogRequest::new("t", "m").ok());
-        assert!(is_unavailable(&response));
+        let result = try_show(&DialogRequest::new("t", "m").ok());
         std::env::remove_var(HELPER_ENV);
+        assert!(matches!(
+            result,
+            Err(HelperError::Spawn(_) | HelperError::NoDisplay | HelperError::HelperNotFound)
+        ));
+    }
+
+    #[test]
+    fn silence_is_recognised() {
+        assert!(is_unavailable(&DialogResponse::unavailable()));
+        assert!(!is_unavailable(&DialogResponse::answered("ok", None)));
     }
 }
